@@ -101,7 +101,7 @@
 
     .lessons {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       margin-bottom: 20px;
     }
@@ -568,11 +568,14 @@
       <button class="lesson-tab" id="tab-carry" role="tab" aria-selected="true" aria-controls="machine" data-mode="carry" type="button">
         <span class="lesson-number">01</span><span>进位</span>
       </button>
+      <button class="lesson-tab" id="tab-borrow" role="tab" aria-selected="false" aria-controls="machine" data-mode="borrow" type="button" tabindex="-1">
+        <span class="lesson-number">02</span><span>倒着拨</span>
+      </button>
       <button class="lesson-tab" id="tab-decimal" role="tab" aria-selected="false" aria-controls="machine" data-mode="decimal" type="button" tabindex="-1">
-        <span class="lesson-number">02</span><span>小数点</span>
+        <span class="lesson-number">03</span><span>小数点</span>
       </button>
       <button class="lesson-tab" id="tab-float" role="tab" aria-selected="false" aria-controls="machine" data-mode="float" type="button" tabindex="-1">
-        <span class="lesson-number">03</span><span>点点搬家</span>
+        <span class="lesson-number">04</span><span>点点搬家</span>
       </button>
     </nav>
 
@@ -648,14 +651,20 @@
           intro: "按一下，数字就往后走一格。",
           parent: "让她自己按按钮。等两张牌都翻完，再指着说：“9 走到头了，个位回到 0，十位前进 1。”不用要求她复述。"
         },
+        borrow: {
+          eyebrow: "第二站 · 倒着拨",
+          title: "10 往回走，会变成几？",
+          intro: "按一下，数字就往回退一格。",
+          parent: "按之前可以先问一句：“10 往回走一格，会是几？”猜错也没关系。等两张牌都翻完，再指着说：“个位从 0 跳回 9，十位往回退 1。”这就是进位倒过来走，不必讲“退位”这个词。"
+        },
         decimal: {
-          eyebrow: "第二站 · 认识小数点",
+          eyebrow: "第三站 · 认识小数点",
           title: "一杯，还可以再多一点",
           intro: "给果汁加一点点，看看小数点后面的数字。",
           parent: "指着杯子说：“小数点左边是完整的杯数，右边是下一杯里的一点点。”1.5 可以直接说成“一杯半”。"
         },
         float: {
-          eyebrow: "第三站 · 小数点搬家",
+          eyebrow: "第四站 · 小数点搬家",
           title: "数字没变，谁变高了？",
           intro: "还是 1、2、3，只让小数点左右搬家。",
           parent: "先让她猜小树会变高还是变矮，再移动小数点。这里只建立“点的位置会改变大小”的直觉，不必讲乘十、除十。"
@@ -665,6 +674,8 @@
       const state = {
         mode: "carry",
         carry: 9,
+        borrow: 10,
+        borrowWidth: 2,
         decimal: 10,
         float: 2,
         previous: null,
@@ -712,6 +723,9 @@
         if (state.mode === "carry") {
           text = spokenNumber(String(state.carry));
           if (state.lastAction === "carry") text += "。九走到头了，个位回到零，左边前进一。";
+        } else if (state.mode === "borrow") {
+          text = spokenNumber(String(state.borrow));
+          if (state.lastAction === "borrow") text += "。零退不动了，个位跳回九，左边往回退一。";
         } else if (state.mode === "decimal") {
           const whole = Math.floor(state.decimal / 10);
           const part = state.decimal % 10;
@@ -731,6 +745,7 @@
 
       function currentValue() {
         if (state.mode === "carry") return String(state.carry).padStart(2, "0");
+        if (state.mode === "borrow") return String(state.borrow).padStart(state.borrowWidth, "0");
         if (state.mode === "decimal") return `${Math.floor(state.decimal / 10)}.${state.decimal % 10}`;
         return ["1.23", "12.3", "123"][state.float];
       }
@@ -820,6 +835,32 @@
         }
       }
 
+      function borrowVisual() {
+        const current = state.borrow % 10;
+        els.visual.innerHTML = `
+          <div class="route">
+            <span class="route-digit ${current === 1 ? "hot" : ""}">1</span>
+            <span class="route-arrow">→</span>
+            <span class="route-digit ${current === 0 ? "hot" : ""}">0</span>
+            <span class="route-arrow">→</span>
+            <span class="route-digit ${current === 9 && state.lastAction === "borrow" ? "hot" : ""}">9</span>
+          </div>
+          <div class="route-plus">个位到 0，再请左边退一格</div>`;
+        if (state.borrow === 0) {
+          els.visualTitle.textContent = "退到最前面啦";
+          els.visualCaption.textContent = "00 再往回，就没有数字了。";
+        } else if (state.lastAction === "borrow") {
+          els.visualTitle.textContent = "咔哒！左边退回 1";
+          els.visualCaption.textContent = "0 跳回 9，旁边那一位往回走。";
+        } else if (current === 0) {
+          els.visualTitle.textContent = "个位回到起点啦";
+          els.visualCaption.textContent = "再倒着拨一下，看看谁会一起翻牌。";
+        } else {
+          els.visualTitle.textContent = "倒着走的小跑道";
+          els.visualCaption.textContent = "倒着走也一样：一路退到 0，再跳回 9。";
+        }
+      }
+
       function decimalVisual() {
         const whole = Math.floor(state.decimal / 10);
         const part = state.decimal % 10;
@@ -887,6 +928,19 @@
           } else {
             text = `先按一下，让 ${currentValue()} 往前走吧！`;
           }
+        } else if (state.mode === "borrow") {
+          if (state.lastAction === "borrow") {
+            text = "咔哒！0 → 9，左边退回 1！";
+            celebrate = true;
+          } else if (state.borrow === 0) {
+            text = "退到 00 啦，没有更小的了。按 → 可以往前走。";
+          } else if (state.lastAction === "forward") {
+            text = `往前走了一格，现在是 ${currentValue()}。`;
+          } else if (state.lastAction === "next") {
+            text = state.borrow % 10 === 0 ? "到 0 啦，再倒着拨一下看看！" : `往回退了一格，现在是 ${currentValue()}。`;
+          } else {
+            text = `先按一下，让 ${currentValue()} 往回走吧！`;
+          }
         } else if (state.mode === "decimal") {
           if (state.lastAction === "carry") {
             text = "小数点后面也会进位：1.9 → 2.0！";
@@ -917,6 +971,8 @@
       function renderShortcuts() {
         if (state.mode === "carry") {
           els.shortcuts.innerHTML = `<span>从这里试试</span>${[9,19,99].map(v => `<button class="shortcut ${state.carry === v ? "active" : ""}" data-value="${v}" type="button">${String(v).padStart(2,"0")}</button>`).join("")}`;
+        } else if (state.mode === "borrow") {
+          els.shortcuts.innerHTML = `<span>从这里试试</span>${[10,20,100].map(v => `<button class="shortcut ${state.borrow === v ? "active" : ""}" data-value="${v}" type="button">${String(v).padStart(2,"0")}</button>`).join("")}`;
         } else if (state.mode === "decimal") {
           els.shortcuts.innerHTML = `<span>看看这些</span>${[[10,"1.0"],[15,"1.5"],[19,"1.9"]].map(([v,label]) => `<button class="shortcut ${state.decimal === v ? "active" : ""}" data-value="${v}" type="button">${label}</button>`).join("")}`;
         } else {
@@ -941,6 +997,13 @@
           els.main.disabled = state.carry >= 999;
           els.back.disabled = state.carry <= 0;
           carryVisual();
+        } else if (state.mode === "borrow") {
+          els.main.textContent = "倒着拨 · －1";
+          els.back.textContent = "→";
+          els.back.setAttribute("aria-label", "数字向前走一步");
+          els.main.disabled = state.borrow <= 0;
+          els.back.disabled = state.borrow >= 999;
+          borrowVisual();
         } else if (state.mode === "decimal") {
           els.main.textContent = "加一点 · ＋0.1";
           els.back.textContent = "←";
@@ -978,6 +1041,9 @@
         if (state.mode === "carry" && state.carry < 999) {
           state.lastAction = state.carry % 10 === 9 ? "carry" : "next";
           state.carry++;
+        } else if (state.mode === "borrow" && state.borrow > 0) {
+          state.lastAction = state.borrow % 10 === 0 ? "borrow" : "next";
+          state.borrow--;
         } else if (state.mode === "decimal" && state.decimal < 20) {
           state.lastAction = state.decimal % 10 === 9 ? "carry" : "next";
           state.decimal++;
@@ -985,10 +1051,11 @@
           state.float--;
           state.lastAction = "left";
         } else return;
-        clickSound(state.lastAction === "carry" ? 1.4 : 1);
-        if (state.lastAction === "carry") setTimeout(() => clickSound(1.8), 190);
+        const chain = state.lastAction === "carry" || state.lastAction === "borrow";
+        clickSound(chain ? 1.4 : 1);
+        if (chain) setTimeout(() => clickSound(1.8), 190);
         render(oldValue);
-        if (state.lastAction === "carry") setTimeout(speakCurrent, 600);
+        if (chain) setTimeout(speakCurrent, 600);
       }
 
       function moveBack() {
@@ -996,6 +1063,10 @@
         if (state.mode === "carry" && state.carry > 0) {
           state.carry--;
           state.lastAction = "back";
+        } else if (state.mode === "borrow" && state.borrow < 999) {
+          state.borrow++;
+          state.borrowWidth = Math.max(state.borrowWidth, String(state.borrow).length);
+          state.lastAction = "forward";
         } else if (state.mode === "decimal" && state.decimal > 0) {
           state.decimal--;
           state.lastAction = "back";
@@ -1012,7 +1083,7 @@
         tab.addEventListener("keydown", (event) => {
           if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
           event.preventDefault();
-          const modes = ["carry", "decimal", "float"];
+          const modes = ["carry", "borrow", "decimal", "float"];
           const direction = event.key === "ArrowRight" ? 1 : -1;
           const next = (modes.indexOf(state.mode) + direction + modes.length) % modes.length;
           changeMode(modes[next]);
@@ -1025,6 +1096,7 @@
       els.listen.addEventListener("click", () => { clickSound(1.2); speakCurrent(); });
       els.reset.addEventListener("click", () => {
         if (state.mode === "carry") state.carry = 9;
+        if (state.mode === "borrow") { state.borrow = 10; state.borrowWidth = 2; }
         if (state.mode === "decimal") state.decimal = 10;
         if (state.mode === "float") state.float = 2;
         state.lastAction = "start";
@@ -1039,6 +1111,7 @@
         const value = Number(button.dataset.value);
         const oldValue = currentValue();
         if (state.mode === "carry") state.carry = value;
+        if (state.mode === "borrow") { state.borrow = value; state.borrowWidth = Math.max(2, String(value).length); }
         if (state.mode === "decimal") state.decimal = value;
         state.lastAction = "start";
         clickSound();
