@@ -1,7 +1,7 @@
 # Little Number Machine · 数字咔哒机
 
-> A playful mechanical counter for exploring carrying, decimal points, and place value with young children.  
-> 一台给孩子亲手操作的机械计数器，用来探索进位、小数点和数位的意义。
+> A playful mechanical counter for exploring carrying, counting backwards, decimal points, and place value with young children.  
+> 一台给孩子亲手操作的机械计数器，用来探索进位、倒着数、小数点和数位的意义。
 
 **Try it / 在线体验：** [Open the Little Number Machine](https://yuyang-rgb094.github.io/little-number-machine/)  
 **Run locally / 本地使用：** Download this project and open `index.html` in a browser. No installation or internet connection is required.  
@@ -11,11 +11,11 @@
 
 Little Number Machine is a screen-based teaching toy originally designed for a three-year-old who already recognizes Arabic numerals. Instead of asking her to count objects or answer questions, it invites her to turn a mechanical counter and notice what changes.
 
-The project follows a short learning path: a digit reaches 9 and carries into the next place; a decimal point separates whole cups from part of another cup; and the same digits represent different amounts when the decimal point moves.
+The project follows a short learning path: a digit reaches 9 and carries into the next place; counting backwards runs the same rule in reverse, so `10` becomes `09`; a decimal point separates whole cups from part of another cup; and the same digits represent different amounts when the decimal point moves.
 
 数字咔哒机最初是为一位已经认识阿拉伯数字的三岁孩子设计的屏幕教具。它不要求孩子数物品，也不通过答题来检验学习成果，而是让孩子亲手拨动机械计数器，观察数字和数量发生的变化。
 
-教具由三个小游戏组成：个位走到 9 后向高位进位；小数点把完整的果汁杯和不到一杯的部分分开；数字保持不变时，移动小数点会改变所表示的数量。
+教具由四个小游戏组成：个位走到 9 后向高位进位；倒着拨时同一规律反过来走，`10` 变回 `09`；小数点把完整的果汁杯和不到一杯的部分分开；数字保持不变时，移动小数点会改变所表示的数量。
 
 ## Background · 设计背景
 
@@ -37,9 +37,9 @@ The child presses one button and watches the machine respond. An adult offers a 
 
 ### 2. Change one thing at a time · 每次只改变一个关键条件
 
-During carrying, the digits change. In the decimal activity, the juice and the final digit change together. In the moving-point activity, the digits stay fixed while only the decimal point moves.
+During carrying and counting backwards, the digits change. In the decimal activity, the juice and the final digit change together. In the moving-point activity, the digits stay fixed while only the decimal point moves.
 
-进位游戏关注数字牌的变化；小数游戏让果汁和最后一位数字同步变化；搬家游戏则保持数字不变，只移动小数点。
+进位和倒着拨游戏关注数字牌的变化；小数游戏让果汁和最后一位数字同步变化；搬家游戏则保持数字不变，只移动小数点。
 
 ### 3. Connect symbols with familiar quantities · 把数字和熟悉的数量联系起来
 
@@ -75,7 +75,21 @@ The intended discovery is: **when one digit reaches the end of its cycle, it ret
 “9 走到头了，个位回到 0，左边前进 1。”  
 “Nine is the end of this digit’s cycle. It returns to zero, and the digit on the left moves forward.”
 
-### 02 · Decimal Point · 认识小数点
+### 02 · Counting Backwards · 倒着拨
+
+The child turns the counter back from `10` to `09`. The ones digit jumps from 0 back to 9 while the tens digit moves back by one. Presets such as `20` and `100` show the same pattern again, including two cards flipping together at `100 → 099`. The → button moves forward one step, so the child can go back and forth across the same boundary.
+
+The intended discovery is: **carrying can run in reverse. When a digit has nowhere further back to go, it jumps to 9 and the digit on its left steps back.** This prepares the later idea of borrowing in subtraction without naming it.
+
+孩子把计数器从 `10` 倒着拨到 `09`，看到个位从 0 跳回 9，同时十位往回退 1。也可以选择 `20` 或 `100`，在 `100 → 099` 时会看到两张牌一起翻。→ 按钮会往前走一格，孩子可以在同一个分界处来回拨。
+
+希望孩子形成的直觉是：**进位也能倒过来走。某一位退到 0 以后跳回 9，并请左边那一位往回退一格。** 这为以后理解减法里的退位打下基础，但不需要说出“退位”这个词。
+
+**Suggested adult prompt / 家长可以说：**  
+“10 往回走一格，会是几？”按完以后：“个位从 0 跳回 9，十位往回退 1。”  
+“What comes one step back from ten?” After the cards flip: “The ones digit jumps back to nine, and the tens digit steps back by one.”
+
+### 03 · Decimal Point · 认识小数点
 
 Adding a little juice changes `1.0` into `1.1`, then `1.2`. At `1.5`, the display shows one full cup and half of another. At `1.9`, one more step produces `2.0`, connecting decimal notation with the carrying pattern encountered earlier.
 
@@ -89,7 +103,7 @@ The intended discoveries are: **a decimal point is a position marker; `1.5` lies
 “小数点左边是完整的杯数，右边是下一杯里的一点点。”  
 “The digits on the left tell us the whole cups. The digit on the right tells us about part of another cup.”
 
-### 03 · Moving Point · 点点搬家
+### 04 · Moving Point · 点点搬家
 
 The digits `1`, `2`, and `3` remain fixed while the decimal point moves through `123`, `12.3`, and `1.23`. A growing tree gives a qualitative sense of the changing amount.
 
@@ -115,7 +129,7 @@ The styling is functional rather than decorative: large digits support attention
 
 ## Teaching Mode · 亲子共玩模式
 
-The intended format is short adult-child co-play, usually one or two minutes per activity. The child operates the machine; the adult watches, asks an occasional prediction question, and names what happened. There is no need to complete all three activities in one sitting.
+The intended format is short adult-child co-play, usually one or two minutes per activity. The child operates the machine; the adult watches, asks an occasional prediction question, and names what happened. There is no need to complete every activity in one sitting.
 
 A simple rhythm is:
 
@@ -124,7 +138,7 @@ A simple rhythm is:
 3. **Describe:** offer one short sentence about the change.
 4. **Repeat or stop:** follow the child's interest rather than a lesson plan.
 
-推荐使用亲子共玩的方式，每个小游戏持续一两分钟即可。孩子负责操作，大人负责陪伴观察，偶尔让她猜一猜接下来会怎样，再用一句话描述已经发生的变化。不需要一次完成三个游戏。
+推荐使用亲子共玩的方式，每个小游戏持续一两分钟即可。孩子负责操作，大人负责陪伴观察，偶尔让她猜一猜接下来会怎样，再用一句话描述已经发生的变化。不需要一次完成所有游戏。
 
 可以遵循这样的节奏：
 
@@ -145,8 +159,8 @@ The project is a teaching toy, not an assessment tool or a substitute for a stru
 
 ## Features · 功能特点
 
-- **Three focused activities:** carrying, decimal notation, and moving the decimal point.  
-  **三个专注的小游戏：** 进位、小数表示和小数点搬家。
+- **Four focused activities:** carrying, counting backwards, decimal notation, and moving the decimal point.  
+  **四个专注的小游戏：** 进位、倒着拨、小数表示和小数点搬家。
 - **Mechanical feedback:** split-flap animation and synthesized click sounds.  
   **机械反馈：** 翻牌动画和程序生成的咔哒声。
 - **Optional Chinese narration:** uses the device's built-in speech synthesis when available.  
